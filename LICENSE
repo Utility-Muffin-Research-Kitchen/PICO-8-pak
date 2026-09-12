@@ -20,7 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-NOTE: this licence covers THIS REPOSITORY's build system, manifests, scripts,
-and documentation only. It does not cover the ScummVM libretro core that
-core/build-core.sh fetches and builds, which is GPL-3.0-or-later. See
-LICENSES/README.md.
+NOTE: this license covers the integration code, build system, manifests,
+scripts, and documentation in this repository. It does not cover the
+proprietary PICO-8 runtime, which you purchase and install separately.

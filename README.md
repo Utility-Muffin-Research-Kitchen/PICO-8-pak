@@ -27,7 +27,9 @@ file writes stay with the selected ROM source. No card libraries are merged.
 
 Press **MENU** to show the return-to-Leaf prompt, then press **MENU** again
 within four seconds to quit normally. Wait for the prompt to disappear to
-keep playing. This also works in Splore with no cart selected.
+keep playing. This also works in Splore with no cart selected. If PICO-8 stays
+frozen, wait at least two seconds and repeat the MENU confirmation to force
+it to close. Unsaved progress may be lost.
 
 Use **START** for PICO-8's native menu. Direct carts offer **Shutdown**;
 Splore carts offer **Exit to Splore** and **Options > Shutdown PICO-8**.
@@ -43,7 +45,7 @@ progress. Later core choices and Leaf favorites stay independent.
 
 Unfavoriting keeps your copy. Newer versions already downloaded by Splore
 update imported copies without changing their library identity. Edited files
-are kept. Missing or incomplete downloads are retried after the next Splore
+and filename conflicts are skipped without an import failure. Missing or incomplete downloads are retried after the next Splore
 session. Deleting a copy while it remains a Splore favorite allows reimport.
 Multi-cart games can still require additional downloads.
 

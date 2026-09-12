@@ -22,10 +22,13 @@
 
 #define CART_MAX (2 * 1024 * 1024)
 static sqlite3 *db;
-static int errors, imported, updated;
+static int errors, skipped, imported, updated;
 static char home[PATH_MAX], root[PATH_MAX], cache[PATH_MAX], library[PATH_MAX];
 static void problem(const char *id, const char *what) {
     fprintf(stderr, "PICO-8 import: %s: %s\n", id, what); errors++;
+}
+static void skip(const char *id, const char *what) {
+    fprintf(stderr, "PICO-8 import: %s: %s\n", id, what); skipped++;
 }
 static bool path(char *out, const char *base, const char *name) {
     int n = snprintf(out, PATH_MAX, "%s/%s", base, name);
@@ -177,15 +180,15 @@ static bool favourites(void) {
         "INSERT INTO imports(id,title,favourite) VALUES(?,?,1) ON CONFLICT(id) DO UPDATE SET title=excluded.title,favourite=1", -1, &st, NULL) == SQLITE_OK;
     char line[2048];
     while (ok && fgets(line, sizeof(line), f)) {
-        if (!strchr(line, '\n') && !feof(f)) { problem("favourites", "overlong row"); int c; while ((c=fgetc(f)) != '\n' && c != EOF) {} continue; }
+        if (!strchr(line, '\n') && !feof(f)) { skip("favourites", "overlong row"); int c; while ((c=fgetc(f)) != '\n' && c != EOF) {} continue; }
         char *fields[7], *cursor = line; int count = 0;
         while (count < 7 && cursor) {
-            fields[count++] = cursor; char *sep = strchr(cursor, '|');
+            fields[count++] = cursor; char *sep = count < 7 ? strchr(cursor, '|') : NULL;
             if (sep) { *sep = 0; cursor = sep+1; } else cursor = NULL;
         }
         for (int i=0; i<count; i++) fields[i] = trim(fields[i]);
         if (count != 7 || cursor || *fields[0] || !id_ok(fields[2]) || revision(fields[1], fields[2], "") < 0) {
-            problem("favourites", "unsupported or malformed row skipped"); continue;
+            skip("favourites", "unsupported or malformed row skipped"); continue;
         }
         const char *title = title_ok(fields[6]) ? fields[6] : fields[2];
         sqlite3_bind_text(st, 1, fields[2], -1, SQLITE_TRANSIENT);
@@ -206,6 +209,9 @@ static void import_one(const char *id, const char *title, int rev, const char *h
     if (!exists && errno != ENOENT) { problem(id, "cannot inspect destination"); return; }
     char current[65] = ""; size_t size = 0;
     unsigned char *bytes = exists ? read_bytes(dest, &size, current) : NULL;
+    if (exists && S_ISREG(st.st_mode) && st.st_size > 0 && st.st_size <= CART_MAX && !bytes) {
+        problem(id, "cannot read destination; keeping it"); return;
+    }
     free(bytes);
     char installed[65]; snprintf(installed, sizeof(installed), "%s", hash);
     if (exists && pending >= 0 && !strcmp(current, next)) {
@@ -213,10 +219,11 @@ static void import_one(const char *id, const char *title, int rev, const char *h
         rev = pending; snprintf(installed, sizeof(installed), "%s", next);
     }
     if (exists && (!*current || !*installed || strcmp(current, installed))) {
-        problem(id, "destination is unrelated or locally modified; keeping it"); return;
+        skip(id, "destination is unrelated or locally modified; keeping it"); return;
     }
     if (!exists && !favourite) return;
     DIR *d = opendir(cache);
+    if (!d && errno != ENOENT) { problem(id, "cannot read cache directory"); return; }
     int newest = -1; char source[PATH_MAX] = "";
     if (d) {
         struct dirent *ent;
@@ -241,7 +248,7 @@ static void import_one(const char *id, const char *title, int rev, const char *h
             }
         }
         free(bytes);
-    } else if (!exists) problem(id, "favourite has no complete cached revision");
+    } else if (!exists) skip(id, "favourite has no cached revision; download it in Splore");
     if (exists && rev >= 0 && *installed) {
         char readable[256];
         fprintf(report, "%s\t%s\n", id, display_title(id, title, readable));
@@ -249,15 +256,16 @@ static void import_one(const char *id, const char *title, int rev, const char *h
 }
 int main(void) {
     const char *h = getenv("UMRK_PICO8_HOME_PATH"), *r = getenv("UMRK_PICO8_ROOT_PATH");
+    struct stat st;
     if (!h || !r || !realpath(h, home) || !realpath(r, root) ||
-        !path(cache, home, "bbs/carts") || !directory(cache) ||
+        !path(cache, home, "bbs/carts") ||
         !path(library, root, "Splore") || (mkdir(library, 0755) && errno != EEXIST) || !directory(library)) return 1;
+    if (lstat(cache, &st) == 0 ? !S_ISDIR(st.st_mode) : errno != ENOENT) return 1;
     char p[PATH_MAX];
     if (!path(p, home, "splore-import.lock")) return 1;
     int lock = open(p, O_CREAT | O_RDWR | O_NOFOLLOW, 0600);
     if (lock < 0 || flock(lock, LOCK_EX | LOCK_NB)) return 1;
     if (!path(p, home, "splore-imports.sqlite3")) return 1;
-    struct stat st;
     if (!lstat(p, &st) && !S_ISREG(st.st_mode)) return 1;
     if (sqlite3_open(p, &db) != SQLITE_OK) return 1;
     sqlite3_busy_timeout(db, 1000);
@@ -301,6 +309,6 @@ int main(void) {
     bool ok = body && !ferror(report) && fseek(report,0,SEEK_SET)==0 && fread(body,1,(size_t)length,report)==(size_t)length;
     if (!ok || !path(p,home,"splore-library.tsv") || !write_atomic(p,body,(size_t)(length<0?0:length),home)) problem("library", "cannot publish import report");
     free(body); fclose(report); sqlite3_close(db); close(lock);
-    fprintf(stderr,"PICO-8 import: added=%d updated=%d errors=%d\n",imported,updated,errors);
+    fprintf(stderr,"PICO-8 import: added=%d updated=%d skipped=%d errors=%d\n",imported,updated,skipped,errors);
     return errors ? 1 : 0;
 }

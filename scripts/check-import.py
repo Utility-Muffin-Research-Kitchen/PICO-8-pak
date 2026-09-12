@@ -85,6 +85,9 @@ static int faulty_rename(const char *a,const char *b) {
     assert 'Same / title: stars ★' in report.read_text()
     old = dest.stat().st_mtime_ns
     run(); assert dest.stat().st_mtime_ns == old
+    # The last column is the title, including literal pipe characters.
+    fav.write_text(favourite('leaf_import_a', title='A | B | C'))
+    run(); assert 'leaf_import_a\tA | B | C\n' in report.read_text()
     # Existing ID-only titles get readable labels without renaming carts.
     fav.write_text(favourite('leaf_import_a', title='leaf_import_a') +
                    favourite('leaf_import_b', title='Super_Title 2048!'))
@@ -113,7 +116,7 @@ static int faulty_rename(const char *a,const char *b) {
     # Manual edits, unrelated collisions, and invalid PNGs are never replaced.
     dest.write_bytes(b'user edit')
     (cache/'leaf_import_a-11.p8.png').write_bytes(png(11))
-    run(1); assert dest.read_bytes() == b'user edit' and 'leaf_import_a' not in report.read_text()
+    run(); run(); assert dest.read_bytes() == b'user edit' and 'leaf_import_a' not in report.read_text()
     dest.write_bytes(png(10))
     (cache/'leaf_import_a-11.p8.png').write_bytes(png(11)[:-12])
     run(1); assert dest.read_bytes() == png(10) and state()[0] == 10
@@ -126,7 +129,10 @@ static int faulty_rename(const char *a,const char *b) {
     assert state()[1] == hashlib.sha256(png(11)).hexdigest()
     # Cache absent for new favourite: no placeholder; later successful retry.
     fav.write_text(favourite('missing'))
-    run(1); assert not (roms/'Splore/missing.p8.png').exists()
+    run(); run(); assert not (roms/'Splore/missing.p8.png').exists()
+    shutil.rmtree(cache)
+    run(); assert not (roms/'Splore/missing.p8.png').exists()
+    cache.mkdir(parents=True)
     (cache/'missing-0.p8.png').write_bytes(png(13))
     run(); assert (roms/'Splore/missing.p8.png').exists()
     (roms/'Splore/missing.p8.png').unlink()
@@ -137,7 +143,7 @@ static int faulty_rename(const char *a,const char *b) {
     fav.write_text(favourite('../escape') + favourite('collision'))
     (cache/'collision-0.p8.png').write_bytes(png(4))
     collision = roms/'Splore/collision.p8.png'; collision.write_bytes(png(5))
-    run(1); assert collision.read_bytes() == png(5)
+    run(); run(); assert collision.read_bytes() == png(5)
     fav.write_text(favourite('symlink'))
     (cache/'symlink-0.p8.png').symlink_to(cache/'missing-0.p8.png')
     run(1); assert not (roms/'Splore/symlink.p8.png').exists()
@@ -147,7 +153,7 @@ static int faulty_rename(const char *a,const char *b) {
     shutil.move(work/'primary', moved)
     home=moved/'.userdata/mlp1/pico8'; roms=moved/'Roms/PICO8'
     env.update(UMRK_PICO8_HOME_PATH=str(home), UMRK_PICO8_ROOT_PATH=str(roms))
-    # An unrelated collision stays reported but cannot stop other imports.
-    run(1)
+    # An unrelated collision is a logged skip and cannot stop other imports.
+    run()
     assert (roms/'Splore/missing.p8.png').read_bytes() == png(13)
 print('PASS: favourites, revisions, permanent copies, collisions, PNG validation, full card, interrupted writes, recovery, mount changes')
