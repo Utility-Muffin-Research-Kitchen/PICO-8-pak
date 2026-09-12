@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "content",
+  "id": "org.umrk.pico8",
+  "name": "PICO-8 for Leaf",
+  "summary": "Browse Splore and play your PICO-8 carts natively.",
+  "description": "Adds Splore in Apps and native PICO-8 in the Core picker on MLP1. You purchase PICO-8 separately and copy the Raspberry Pi runtime to your primary card. FAKE-08 stays your default until you choose native PICO-8.",
+  "author": "Utility Muffin Research Kitchen",
+  "categories": ["emulation", "content"],
+  "leaf": {"packages": [{
+    "platform": "mlp1",
+    "version": "0.1.0",
+    "min_leaf_version": "9999.0.0",
+    "artifact_name": "PICO8.mlp1.pak.zip",
+    "install_name": "PICO8.pak",
+    "runtime_manifest_path": "pak.json",
+    "package_dir": "build/package/PICO8.pak",
+    "build_command": ["make", "package-mlp1"]
+  }]}
+}

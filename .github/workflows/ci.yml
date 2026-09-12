@@ -1,0 +1,27 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host check dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libcurl4-openssl-dev libpng-dev libssl-dev libsqlite3-dev
+      - run: make check
+      - run: make package-mlp1
+      - uses: actions/checkout@v4
+        with:
+          repository: Utility-Muffin-Research-Kitchen/leaf-contracts
+          ref: abd2addd2c53093f063154b6e8f27326a5b956ac
+          path: .contract
+      - name: Validate the packaged CONTENT-1 contribution
+        run: python3 scripts/validate-pak.py .contract build/package/PICO8.pak
+      # Publishing remains blocked until a supporting Leaf release is qualified.
