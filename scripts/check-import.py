@@ -30,7 +30,7 @@ with tempfile.TemporaryDirectory(prefix='pico8-import-check-') as temporary:
     # Fault injection is compiled only into this test executable. Production
     # has no environment variable that can interrupt or damage an import.
     fault = work / 'fault.c'
-    fault.write_text('''#define _DEFAULT_SOURCE
+    fault.write_text('''#define _DEFAULT_SOURCE 1
 #define _DARWIN_C_SOURCE
 #define _XOPEN_SOURCE 700
 #include <unistd.h>

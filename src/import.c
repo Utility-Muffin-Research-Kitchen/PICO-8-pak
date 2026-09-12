@@ -1,6 +1,6 @@
 /* Import local Splore favourites after PICO-8 and its downloaders have stopped.
  * SQLite is a private ownership journal, never Leaf's library database. */
-#define _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
 #define _DARWIN_C_SOURCE
 #define _XOPEN_SOURCE 700
 #define _POSIX_C_SOURCE 200809L
