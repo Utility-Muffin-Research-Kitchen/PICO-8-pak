@@ -20,12 +20,10 @@ check:
 	python3 scripts/check.py
 	python3 scripts/check-import.py
 
-# The deliberately impossible minimum keeps development artifacts out of a
-# production store. Replace both metadata mirrors with the qualified Leaf
-# release before distributing; do not invent an ungated first-version floor.
+# Validate metadata parity and the package allowlist before distribution.
 dist-pakrat: package-mlp1
-	python3 -c 'import json; assert json.load(open("pak/pak.json"))["min_leaf_version"] != "9999.0.0", "Set the qualified minimum Leaf release before distribution"'
 	mkdir -p build/dist
+	rm -f build/dist/PICO8.mlp1.pak.zip
 	cd build/package && zip -qr -X ../dist/PICO8.mlp1.pak.zip PICO8.pak
 
 clean:

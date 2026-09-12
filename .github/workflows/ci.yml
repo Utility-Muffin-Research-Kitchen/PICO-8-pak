@@ -24,4 +24,4 @@ jobs:
           path: .contract
       - name: Validate the packaged CONTENT-1 contribution
         run: python3 scripts/validate-pak.py .contract build/package/PICO8.pak
-      # Publishing remains blocked until a supporting Leaf release is qualified.
+      # Release artifacts are published deliberately, never on an ordinary push.

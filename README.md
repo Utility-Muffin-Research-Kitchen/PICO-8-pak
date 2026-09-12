@@ -7,11 +7,9 @@ separately. The paid runtime and vendor artwork are not included.
 The included Apps icon is a ChatGPT-generated illustration. Its original is
 archived in `umrk-assets`; see `art/LICENSE-ASSETS.md` in the package for provenance.
 
-This is an unreleased development integration. The `9999.0.0` minimum in both
-metadata files deliberately blocks production store distribution until a Leaf
-release with `native-pico8-v1` has been qualified and named. Do not lower it
-just to bypass that release check. The wrapper also checks the daemon feature
-and its per-launch protected-input flag.
+This integration requires Leaf 0.12.0 or newer on MLP1. Pak Rat gates
+installation on that version. The wrapper also checks the daemon's
+`native-pico8-v1` capability and its per-launch protected-input flag.
 
 Copy `pico8_64` and `pico8.dat` from the same **Raspberry Pi** download into
 `BIOS/PICO8/` on your primary card. Install the integration as

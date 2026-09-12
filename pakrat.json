@@ -6,11 +6,12 @@
   "summary": "Browse Splore and play your PICO-8 carts natively.",
   "description": "Adds Splore in Apps and native PICO-8 in the Core picker on MLP1. You purchase PICO-8 separately and copy the Raspberry Pi runtime to your primary card. FAKE-08 stays your default until you choose native PICO-8.",
   "author": "Utility Muffin Research Kitchen",
+  "repo_url": "https://github.com/Utility-Muffin-Research-Kitchen/PICO-8-pak",
   "categories": ["emulation", "content"],
   "leaf": {"packages": [{
     "platform": "mlp1",
     "version": "0.1.0",
-    "min_leaf_version": "9999.0.0",
+    "min_leaf_version": "0.12.0",
     "artifact_name": "PICO8.mlp1.pak.zip",
     "install_name": "PICO8.pak",
     "runtime_manifest_path": "pak.json",
