@@ -1,5 +1,6 @@
 {
   "name": "PICO-8 for Leaf",
+  "icon": "art/PICO8-photo.png",
   "platform": "mlp1",
   "pak_version": "0.1.0",
   "min_leaf_version": "9999.0.0",

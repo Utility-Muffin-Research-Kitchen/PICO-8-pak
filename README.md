@@ -4,6 +4,9 @@ You can browse Splore and play local PICO-8 carts natively on MLP1 with this
 optional Leaf integration. You purchase [PICO-8 by Joseph White / Lexaloffle](https://www.lexaloffle.com/pico-8.php)
 separately. The paid runtime and vendor artwork are not included.
 
+The included Apps icon is a ChatGPT-generated illustration. Its original is
+archived in `umrk-assets`; see `art/LICENSE-ASSETS.md` in the package for provenance.
+
 This is an unreleased development integration. The `9999.0.0` minimum in both
 metadata files deliberately blocks production store distribution until a Leaf
 release with `native-pico8-v1` has been qualified and named. Do not lower it

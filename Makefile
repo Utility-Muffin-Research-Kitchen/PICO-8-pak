@@ -5,10 +5,11 @@ PACKAGE := build/package/PICO8.pak
 
 .PHONY: package-mlp1 check dist-pakrat clean
 package-mlp1:
-	mkdir -p $(PACKAGE)/bin
+	mkdir -p $(PACKAGE)/bin $(PACKAGE)/art
 	cp pak/launch.sh pak/launch-cart.sh pak/pak.json $(PACKAGE)/
 	cp pak/bin/pico8-launch $(PACKAGE)/bin/
 	cp LICENSE README.md $(PACKAGE)/
+	cp pak/art/PICO8-photo.png pak/art/LICENSE-ASSETS.md $(PACKAGE)/art/
 	docker run --rm -v "$(ROOT):/workspace" -w /workspace "$(TOOLCHAIN_IMAGE)" sh -ec '\
 	  aarch64-buildroot-linux-gnu-gcc -std=c11 -O2 -Wall -Wextra src/wget.c $$(pkg-config --cflags --libs libcurl) -o $(PACKAGE)/bin/wget; \
 	  aarch64-buildroot-linux-gnu-gcc -std=c11 -O2 -Wall -Wextra src/message.c $$(pkg-config --cflags --libs sdl2 SDL2_ttf) -o $(PACKAGE)/bin/pico8-message; \
