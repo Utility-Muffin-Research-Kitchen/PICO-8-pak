@@ -14,6 +14,7 @@ No exclusive rights are claimed in the generated illustration. PICO-8 names
 and marks belong to their respective rights holders and identify the platform.
 This is not official Lexaloffle artwork or part of the purchased runtime.
 
-The same scaled image is included in Leaf's built-in photographic system set.
-The pak uses it for the Apps entry. PICO-8 remains a built-in system, so the
+Leaf's built-in photographic system set uses the same illustration at 70% of
+this size within its own 384x384 canvas, matching neighboring Games artwork.
+The pak keeps this larger framing for the Apps entry. PICO-8 remains a built-in system, so the
 pak adds its native core without replacing the system definition or its artwork.
