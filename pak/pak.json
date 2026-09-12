@@ -1,0 +1,23 @@
+{
+  "name": "PICO-8 for Leaf",
+  "icon": "art/PICO8-photo.png",
+  "platform": "mlp1",
+  "pak_version": "0.1.0",
+  "min_leaf_version": "0.12.0",
+  "provides": {
+    "schema": 1,
+    "cores": [{
+      "id": "pico8_native",
+      "display_name": "PICO-8 (native)",
+      "type": "path",
+      "path": "launch-cart.sh",
+      "supports_menu": false,
+      "supports_savestate": false,
+      "supports_disk_control": false
+    }],
+    "system_extensions": [{
+      "system_id": "PICO8",
+      "add_alternate_cores": ["pico8_native"]
+    }]
+  }
+}

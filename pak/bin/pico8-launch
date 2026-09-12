@@ -1,0 +1,62 @@
+#!/bin/sh
+# --check is read-only and must never query the daemon (which is waiting on it).
+set -eu
+pak=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+mode=${1:-}
+setup='Copy pico8_64 and pico8.dat from the same Raspberry Pi PICO-8 download to BIOS/PICO8 on your primary card. See leaf.game/guide/pico-8/.'
+fail() {
+    printf 'PICO-8: %s\n' "$1" >&2
+    [ "$mode" != --check ] || exit 1
+    "$pak/bin/pico8-message" "$1" || true
+    exit 1
+}
+if [ "$mode" != --check ]; then
+    [ "${UMRK_PICO8_SESSION:-}" = 1 ] || fail 'Update Leaf to a version with native PICO-8 support, then open PICO-8 from Apps or Core. See leaf.game/guide/pico-8/.'
+    # The daemon sets this behavior flag only on its protected input route;
+    # the narrow daemon feature guards sideloads on older launchers too.
+    reply=$(timeout 2 "${UMRK_BIN_PATH:?}/jawaka-platformctl" --socket "${UMRK_DAEMON_SOCKET:?}" request '{"type":"hello","role":"app"}') || fail 'Leaf did not answer. Return to Leaf and try again.'
+    printf '%s\n' "$reply" | grep -q '"native-pico8-v1"' || fail 'Update Leaf for native PICO-8 support. See leaf.game/guide/pico-8/.'
+fi
+for path in "${UMRK_PICO8_RUNTIME_PATH:-}" "${UMRK_PICO8_HOME_PATH:-}" "${UMRK_PICO8_ROOT_PATH:-}" "${UMRK_PICO8_DESKTOP_PATH:-}"; do
+    case "$path" in /*) ;; *) fail 'Leaf could not resolve the primary card and game paths. Return to Leaf and try again.' ;; esac
+done
+runtime=$UMRK_PICO8_RUNTIME_PATH
+[ -r "$runtime/pico8_64" ] && [ -x "$runtime/pico8_64" ] && [ -r "$runtime/pico8.dat" ] && [ -s "$runtime/pico8.dat" ] || fail "$setup"
+elf=$(od -An -tx1 -N20 "$runtime/pico8_64" | tr -d ' \n')
+[ "${#elf}" = 40 ] || fail "$setup"
+case "$elf" in
+    7f454c46020101*0[23]00b700) ;;
+    *) fail "$setup" ;;
+esac
+[ "$(dd if="$runtime/pico8.dat" bs=4 count=1 2>/dev/null)" = CPOD ] || fail "$setup"
+# Resolve the actual loader dependencies without starting native PICO-8.
+timeout 1 /lib/ld-linux-aarch64.so.1 --list "$runtime/pico8_64" >/dev/null 2>&1 || fail "$setup"
+[ "$mode" != --check ] || exit 0
+[ "$#" = 1 ] || fail 'Choose a PICO-8 cart in Leaf, or open PICO-8 from Apps.'
+case "$mode" in
+    --splore) set -- -splore ;;
+    /*.p8|/*.P8|/*.png|/*.PNG)
+        [ -f "$mode" ] && [ -r "$mode" ] || fail 'This cart is unavailable. Check its SD card and try again.'
+        case "$mode" in
+            *.png|*.PNG)
+                # Cartridge PNGs have a 160 x 205 IHDR. Reject ordinary images
+                # here; PICO-8 itself decodes the embedded cartridge payload.
+                header=$(od -An -tx1 -N24 "$mode" | tr -d ' \n')
+                [ "$header" = 89504e470d0a1a0a0000000d49484452000000a0000000cd ] || fail 'This PNG is not a PICO-8 cartridge image. Choose a cartridge .png or .p8 file.' ;;
+            *)
+                IFS= read -r header < "$mode" || fail 'This PICO-8 cart is incomplete.'
+                case "$header" in 'pico-8 cartridge'*) ;; *) fail 'This file is not a PICO-8 cart. Choose a cartridge .png or .p8 file.' ;; esac ;;
+        esac
+        set -- -run "$mode" ;;
+    *) fail 'Choose a .p8 or cartridge .png file. Extract archives before playing.' ;;
+esac
+mkdir -p "$UMRK_PICO8_HOME_PATH" "$UMRK_PICO8_ROOT_PATH" "$UMRK_PICO8_DESKTOP_PATH" || fail 'PICO-8 cannot write to your card. Check the card and free space.'
+# Upstream writes its own config and controller mapping defaults on first run.
+# No custom seed is needed; leave user edits intact on every subsequent launch.
+export SDL_VIDEODRIVER=wayland
+export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/var/run}"
+export PATH="$pak/bin:$PATH"
+cd "$runtime"
+exec ./pico8_64 -home "$UMRK_PICO8_HOME_PATH/" -root_path "$UMRK_PICO8_ROOT_PATH/" \
+    -desktop "$UMRK_PICO8_DESKTOP_PATH/" -windowed 0 "$@"
