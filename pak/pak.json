@@ -19,5 +19,9 @@
       "system_id": "PICO8",
       "add_alternate_cores": ["pico8_native"]
     }]
+  },
+  "content_art": {
+    "schema": 1,
+    "systems": [{"id": "PICO8", "wordmark": "art/PICO8-wordmark.png"}]
   }
 }

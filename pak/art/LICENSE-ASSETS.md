@@ -17,4 +17,10 @@ This is not official Lexaloffle artwork or part of the purchased runtime.
 Leaf's built-in photographic system set uses the same illustration at 70% of
 this size within its own 384x384 canvas, matching neighboring Games artwork.
 The pak keeps this larger framing for the Apps entry. PICO-8 remains a built-in system, so the
-pak adds its native core without replacing the system definition or its artwork.
+pak adds its native core without replacing the system definition or its console icons.
+
+## System wordmark
+
+`PICO8-wordmark.png` is a separate white system label. See
+[WORDMARK-SOURCE.md](WORDMARK-SOURCE.md) for its source revision, hashes,
+attribution, licence and changes.
