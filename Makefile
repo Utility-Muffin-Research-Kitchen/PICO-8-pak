@@ -10,6 +10,7 @@ package-mlp1:
 	cp pak/bin/pico8-launch $(PACKAGE)/bin/
 	cp LICENSE README.md $(PACKAGE)/
 	cp pak/art/PICO8-photo.png pak/art/LICENSE-ASSETS.md $(PACKAGE)/art/
+	cp pak/art/PICO8-grid.png pak/art/GRID-ICON-SOURCE.md $(PACKAGE)/art/
 	cp pak/art/PICO8-wordmark.png pak/art/WORDMARK-SOURCE.md $(PACKAGE)/art/
 	docker run --rm -v "$(ROOT):/workspace" -w /workspace "$(TOOLCHAIN_IMAGE)" sh -ec '\
 	  aarch64-buildroot-linux-gnu-gcc -std=c11 -O2 -Wall -Wextra src/wget.c $$(pkg-config --cflags --libs libcurl) -o $(PACKAGE)/bin/wget; \

@@ -9,7 +9,8 @@ pak = Path(sys.argv[1])
 expected = {'launch.sh', 'launch-cart.sh', 'pak.json', 'bin/pico8-launch',
             'bin/wget', 'bin/pico8-message', 'bin/pico8-import', 'LICENSE', 'README.md',
             'art/PICO8-photo.png', 'art/LICENSE-ASSETS.md',
-            'art/PICO8-wordmark.png', 'art/WORDMARK-SOURCE.md'}
+            'art/PICO8-wordmark.png', 'art/WORDMARK-SOURCE.md',
+            'art/PICO8-grid.png', 'art/GRID-ICON-SOURCE.md'}
 actual = {p.relative_to(pak).as_posix() for p in pak.rglob('*') if p.is_file()}
 assert actual == expected, (actual - expected, expected - actual)
 assert not any(p.is_symlink() for p in pak.rglob('*')), 'Packages must be FAT32 safe'
