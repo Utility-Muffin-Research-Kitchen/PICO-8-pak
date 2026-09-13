@@ -16,8 +16,8 @@ assert actual == expected, (actual - expected, expected - actual)
 assert not any(p.is_symlink() for p in pak.rglob('*')), 'Packages must be FAT32 safe'
 manifest = json.loads((pak / 'pak.json').read_text())
 assert manifest['icon'] == 'art/PICO8-photo.png'
-assert manifest['content_art'] == {'schema': 1, 'systems': [
-    {'id': 'PICO8', 'wordmark': 'art/PICO8-wordmark.png'}]}
+assert manifest['content_art'] == {'schema': 2, 'systems': [
+    {'id': 'PICO8', 'wordmark': 'art/PICO8-wordmark.png', 'grid_icon': 'art/PICO8-grid.png'}]}
 store = json.loads((root / 'pakrat.json').read_text())['leaf']['packages'][0]
 assert manifest['pak_version'] == store['version']
 assert manifest['min_leaf_version'] == store['min_leaf_version']

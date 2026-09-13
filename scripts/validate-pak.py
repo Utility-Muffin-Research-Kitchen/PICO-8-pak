@@ -13,7 +13,7 @@ manifest = json.loads((pak / 'pak.json').read_text())
 schema = json.loads((contract / 'contracts/leaf-content/content-paks-v1.schema.json').read_text())
 assert minischema.is_valid(manifest, schema)[0]
 assert not content_model.validate_manifest(manifest, str(pak), {'install_lane': 'platform', 'source_id': 'primary'})
-art_schema = json.loads((contract / 'contracts/leaf-content/content-art-v1.schema.json').read_text())
+art_schema = json.loads((contract / 'contracts/leaf-content/content-art-v2.schema.json').read_text())
 assert minischema.is_valid(manifest, art_schema)[0]
 assert not art_model.validate(manifest, str(pak))
 base = {'platform': 'mlp1', 'systems': [{'id': 'PICO8', 'rom_root': 'Roms/PICO8',
@@ -29,8 +29,10 @@ decorated, _, art_diagnostics = art_model.decorate(merged, [
 assert not art_diagnostics, art_diagnostics
 assert decorated['systems'][0]['wordmark'] == 'art/PICO8-wordmark.png'
 assert decorated['systems'][0]['wordmark_provider'] == 'mlp1/PICO8.pak'
+assert decorated['systems'][0]['grid_icon'] == 'art/PICO8-grid.png'
+assert decorated['systems'][0]['grid_icon_provider'] == 'mlp1/PICO8.pak'
 assert decorated['systems'][0].get('provider') == merged['systems'][0].get('provider')
 collision = {'provider': 'mlp1/Other.pak', 'provides': manifest['provides']}
 _, diagnostics = content_model.merge(base, [contributor, collision])
 assert diagnostics and any('collision' in item['reason'] for item in diagnostics), diagnostics
-print('PASS: CONTENT-1 and CONTENT-ART-1, package paths, base ownership, wordmark provenance, alternate merge, collision diagnostics')
+print('PASS: CONTENT-1 and CONTENT-ART-2, package paths, base ownership, wordmark provenance, alternate merge, collision diagnostics')
