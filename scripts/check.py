@@ -42,6 +42,15 @@ with tempfile.TemporaryDirectory(prefix='pico8-check-') as temporary:
         assert not (work / 'message').exists()
         assert not Path(env['UMRK_PICO8_HOME_PATH']).exists()
 
+    # The dialog must build warning-free wherever SDL2_ttf is available; its
+    # visuals are checked on device.
+    sdl = subprocess.run(['pkg-config', '--cflags', '--libs', 'sdl2', 'SDL2_ttf'], capture_output=True, text=True)
+    if sdl.returncode == 0:
+        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', str(root / 'src/message.c'),
+                        *sdl.stdout.split(), '-o', str(work / 'pico8-message')], check=True)
+    else:
+        print('SKIP: pico8-message host build (no SDL2_ttf pkg-config)')
+
     binary = work / 'wget'
     flags = subprocess.check_output(['pkg-config', '--cflags', '--libs', 'libcurl'], text=True).split()
     subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', str(root / 'src/wget.c'), *flags, '-o', str(binary)], check=True)
