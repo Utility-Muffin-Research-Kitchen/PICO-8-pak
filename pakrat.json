@@ -10,7 +10,7 @@
   "categories": ["emulation", "content"],
   "leaf": {"packages": [{
     "platform": "mlp1",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "min_leaf_version": "0.12.0",
     "artifact_name": "PICO8.mlp1.pak.zip",
     "install_name": "PICO8.pak",
