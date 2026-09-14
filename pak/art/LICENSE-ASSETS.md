@@ -23,4 +23,10 @@ pak adds its native core without replacing the system definition or its console 
 
 `PICO8-wordmark.png` is a separate white system label. See
 [WORDMARK-SOURCE.md](WORDMARK-SOURCE.md) for its source revision, hashes,
-attribution, licence and changes.
+attribution, license and changes.
+
+## Grid icon
+
+`PICO8-grid.png` is the 512x512 card shown on the Grid layout tile. See
+[GRID-ICON-SOURCE.md](GRID-ICON-SOURCE.md) for its source revision, hash,
+attribution and license.

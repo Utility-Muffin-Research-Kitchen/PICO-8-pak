@@ -11,7 +11,7 @@ This white RGBA export has a maximum edge of 1024 pixels. Jawaka tints it to
 the current text color. Your build uses this checked-in copy and does not fetch
 the private repository. The source revision records provenance only.
 
-## Source and licence
+## Source and license
 
 Original UMRK geometric pixel lettering, spelling PICO-8, drawn as editable SVG
 geometry. It uses the PICO-8 font idiom as a design reference. Lexaloffle's
